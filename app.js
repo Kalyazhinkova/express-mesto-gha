@@ -21,8 +21,8 @@ export const run = async () => {
     req.user = {
       _id: '6372665aa3bea6f3ea34fc25',
     };
-    if (req.headers['Authorization'] || req.headers['authorization']) {
-      req.user._id = req.headers['Authorization'] || req.headers['authorization'];
+    if (req.headers.Authorization || req.headers.authorization) {
+      req.user._id = req.headers.Authorization || req.headers.authorization;
     }
 
     next();
