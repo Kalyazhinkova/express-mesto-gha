@@ -34,7 +34,8 @@ export const read = async (req, res) => {
 
 export const create = (req, res) => {
   const { name, link } = req.body;
-  Card.create({ name, link })
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
     .then((newCard) => {
       res.send({ data: newCard });
     })
