@@ -1,5 +1,5 @@
 import { constants } from 'http2';
-import { Card } from '../models/card';
+import { Card } from '../models/card.js';
 
 const responseBadRequestError = (res, message) => res
   .status(constants.HTTP_STATUS_BAD_REQUEST)

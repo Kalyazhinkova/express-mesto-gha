@@ -21,13 +21,13 @@ const cardSchema = new Schema({
     },
   },
   owner: {
-    type: Schema.ObjectID,
+    type: Schema.ObjectId,
     ref: 'User',
     required: true,
   },
   likes: {
     type: [{
-      type: Schema.ObjectID,
+      type: Schema.ObjectId,
       ref: 'User',
     }],
     default: [],
