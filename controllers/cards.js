@@ -24,7 +24,7 @@ export const read = async (req, res) => {
     const cards = await Card.find({});
     req.send(cards);
   } catch (err) {
-    if (err.name === 'CastError') {
+    if (err.name === 'ValidationError' || err.name === 'CastError') {
       responseBadRequestError(res, err.message);
     } else {
       responseServerError(res, err.message);
@@ -50,15 +50,15 @@ export const create = async (req, res) => {
 export const remove = (req, res) => {
   Card.findById(req.params.id).then((card) => {
     if (!card) {
-      throw res.status(constants.HTTP_STATUS_NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
+      throw responseNotFound(res, 'Запрашиваемая карточка не найдена');
     } else if (card.owner.toString() !== req.user._id) {
-      throw res.status(constants.HTTP_STATUS_NOT_FOUND).send({ message: 'Нельзя удалить чужую карточку!' });
+      throw responseNotFound(res, 'Нельзя удалить чужую карточку!');
     } else {
       return Card.findByIdAndDelete(req.params.id);
     }
   }).then((card) => { res.send(card); })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         responseBadRequestError(res, err.message);
       } else {
         responseServerError(res, err.message);
@@ -74,13 +74,13 @@ export const likeCard = (req, res) => {
   )
     .then((result) => {
       if (!result) {
-        responseBadRequestError(res, 'Карточки с таким id не существует');
+        responseNotFound(res, 'Карточки с таким id не существует');
       } else { res.send(result); }
     }).catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         responseBadRequestError(res, err.message);
       } else {
-        res.status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка. ${err.message}` });
+        responseServerError(res, err.message);
       }
     });
 };
@@ -92,14 +92,13 @@ export const dislikeCard = (req, res) => {
     { new: true },
   ).then((result) => {
     if (!result) {
-      res.status(constants.HTTP_STATUS_NOT_FOUND)
-        .send({ message: 'Карточки с таким id не существует' });
+      responseNotFound(res, 'Карточки с таким id не существует');
     } else { res.send(result); }
   }).catch((err) => {
     if (err.name === 'CastError' || err.name === 'ValidationError') {
       responseBadRequestError(res, err.message);
     } else {
-      res.status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка. ${err.message}` });
+      responseServerError(res, err.message);
     }
   });
 };
