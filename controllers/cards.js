@@ -32,19 +32,19 @@ export const read = async (req, res) => {
   }
 };
 
-export const create = async (req, res) => {
-  try {
-    const { name, link } = req.body;
-    const card = { name, link, owner: req.user._id };
-    const newCard = await Card.create(card);
-    req.send(newCard);
-  } catch (err) {
-    if (err.name === 'CastError' || err.name === 'ValidationError') {
-      responseBadRequestError(res, err.message);
-    } else {
-      responseServerError(res, err.message);
-    }
-  }
+export const create = (req, res) => {
+  const { name, link } = req.body;
+  Card.create({ name, link })
+    .then((newCard) => {
+      res.send({ data: newCard });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        responseBadRequestError(res, err.message);
+      } else {
+        responseServerError(res, err.message);
+      }
+    });
 };
 
 export const remove = (req, res) => {
