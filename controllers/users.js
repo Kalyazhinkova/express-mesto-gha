@@ -13,6 +13,12 @@ const responseServerError = (res, message) => res
     message: `На сервере произошла ошибка. ${message}`,
   });
 
+const responseNotFound = (res, message) => res
+  .status(constants.HTTP_STATUS_NOT_FOUND)
+  .send({
+    message: `${message}`,
+  });
+
 export const readAll = (req, res) => {
   User.find({})
     .then((users) => {
@@ -30,10 +36,14 @@ export const readAll = (req, res) => {
 export const readById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
-      res.send(user);
+      if (!user) {
+        responseNotFound(res, 'Пользователь не найден.');
+      } else {
+        res.send(user);
+      }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         responseBadRequestError(res, err.message);
       } else {
         responseServerError(res, err.message);
@@ -42,12 +52,14 @@ export const readById = (req, res) => {
 };
 
 export const create = (req, res) => {
-  User.create(req.body)
+  const { name, about, avatar } = req.body;
+
+  User.create({ name, about, avatar })
     .then((user) => {
-      res.send(user);
+      res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         responseBadRequestError(res, err.message);
       } else {
         responseServerError(res, err.message);
@@ -56,7 +68,9 @@ export const create = (req, res) => {
 };
 
 export const update = (req, res) => {
-  User.findByIdAndUpdate(req.user, req.body)
+  const { name, about } = req.body;
+  const userId = req.user._id;
+  User.findByIdAndUpdate(userId, { name, about }, { new: true })
     .then((updateUser) => {
       if (updateUser) {
         res.send(updateUser);
@@ -65,7 +79,7 @@ export const update = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         responseBadRequestError(res, err.message);
       } else {
         responseServerError(res, err.message);

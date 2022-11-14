@@ -13,6 +13,12 @@ const responseServerError = (res, message) => res
     message: `На сервере произошла ошибка. ${message}`,
   });
 
+const responseNotFound = (res, message) => res
+  .status(constants.HTTP_STATUS_NOT_FOUND)
+  .send({
+    message: `${message}`,
+  });
+
 export const read = async (req, res) => {
   try {
     const cards = await Card.find({});

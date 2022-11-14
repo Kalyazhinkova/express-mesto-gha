@@ -6,15 +6,15 @@ import { constants } from 'http2';
 import { router as userRouter } from './routes/users.js';
 import { router as cardRouter } from './routes/cards.js';
 
-const { PORT = 3000, HOST = '0.0.0.0' } = process.env;
-
-export const run = async () => {
+export const run = async (envName) => {
   process.on('unhandleRejection', (err) => {
     console.error(err);
     process.exit(1); // выход с ошибкой
   });
 
   const app = express();
+  const config = { PORT: 3000, HOST: 'localhost' };
+  config.NODE_ENV = envName;
 
   app.use(bodyParser.json());
   app.use((req, res, next) => {
@@ -36,8 +36,8 @@ export const run = async () => {
 
   mongoose.set('runValidators', true);
   await mongoose.connect('mongodb://localhost:27017/mestodb');
-  const server = app.listen(PORT, HOST, () => {
-    console.log(`Сервер запущен http://${HOST}:${PORT}`);
+  const server = app.listen(config.PORT, config.HOST, () => {
+    console.log(`Сервер запущен http://${config.HOST}:${config.PORT}`);
   });
 
   // завершаем работу приложения
