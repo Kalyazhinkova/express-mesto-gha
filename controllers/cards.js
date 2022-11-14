@@ -19,17 +19,18 @@ const responseNotFound = (res, message) => res
     message: `${message}`,
   });
 
-export const read = async (req, res) => {
-  try {
-    const cards = await Card.find({});
-    req.send(cards);
-  } catch (err) {
-    if (err.name === 'ValidationError' || err.name === 'CastError') {
-      responseBadRequestError(res, err.message);
-    } else {
-      responseServerError(res, err.message);
-    }
-  }
+export const read = (req, res) => {
+  Card.find({})
+    .then((cards) => {
+      res.send(cards);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        responseBadRequestError(res, err.message);
+      } else {
+        responseServerError(res, err.message);
+      }
+    });
 };
 
 export const create = (req, res) => {
@@ -49,7 +50,7 @@ export const create = (req, res) => {
 };
 
 export const remove = (req, res) => {
-  Card.findOneAndRemove({ _id: req.params.cardId, owner: req.user._id })
+  Card.findOneAndRemove({ _id: req.params.id, owner: req.user._id })
     .then((card) => {
       if (!card) {
         throw responseNotFound(res, 'Запрашиваемая карточка не найдена');
@@ -68,7 +69,7 @@ export const remove = (req, res) => {
 
 export const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    req.params.id,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
@@ -87,7 +88,7 @@ export const likeCard = (req, res) => {
 
 export const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    req.params.id,
     { $pull: { likes: req.user._id } },
     { new: true },
   ).then((result) => {
