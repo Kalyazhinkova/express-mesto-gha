@@ -86,3 +86,23 @@ export const update = (req, res) => {
       }
     });
 };
+
+export const updateAvatar = (req, res) => {
+  const { avatar } = req.body;
+  const userId = req.user._id;
+  User.findByIdAndUpdate(userId, { avatar }, { new: true })
+    .then((updateUser) => {
+      if (updateUser) {
+        res.send(updateUser);
+      } else {
+        throw responseBadRequestError(res, 'Не удалось обновить пользователя');
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        responseBadRequestError(res, err.message);
+      } else {
+        responseServerError(res, err.message);
+      }
+    });
+};
