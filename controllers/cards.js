@@ -74,7 +74,7 @@ export const likeCard = (req, res) => {
   )
     .then((result) => {
       if (!result) {
-        responseNotFound(res, 'Карточки с таким id не существует');
+        responseBadRequestError(res, 'Карточки с таким id не существует');
       } else { res.send(result); }
     }).catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
