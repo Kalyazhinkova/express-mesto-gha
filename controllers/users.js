@@ -1,23 +1,5 @@
-import { constants } from 'http2';
 import { User } from '../models/user.js';
-
-const responseBadRequestError = (res) => res
-  .status(constants.HTTP_STATUS_BAD_REQUEST)
-  .send({
-    message: 'Некорректные данные для пользователя.',
-  });
-
-const responseServerError = (res) => res
-  .status(constants.HTTP_STATUS_SERVICE_UNAVAILABLE)
-  .send({
-    message: 'На сервере произошла ошибка.',
-  });
-
-const responseNotFound = (res, message) => res
-  .status(constants.HTTP_STATUS_NOT_FOUND)
-  .send({
-    message: `${message}`,
-  });
+import { responseBadRequestError, responseServerError, responseNotFound } from '../errors/errors.js';
 
 export const readAll = (req, res) => {
   User.find({})
