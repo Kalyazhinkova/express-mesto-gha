@@ -7,10 +7,10 @@ const responseBadRequestError = (res) => res
     message: 'Некорректные данные карточки.',
   });
 
-const responseServerError = (res, message) => res
-  .status(constants.HTTP_STATUS_SERVICE_UNAVAILABLE)
+const responseServerError = (res) => res
+  .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
   .send({
-    message: `На сервере произошла ошибка. ${message}`,
+    message: 'На сервере произошла ошибка.',
   });
 
 const responseNotFound = (res, message) => res
@@ -28,7 +28,7 @@ export const read = (req, res) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };
@@ -44,7 +44,7 @@ export const create = (req, res) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };
@@ -62,7 +62,7 @@ export const remove = (req, res) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };
@@ -81,7 +81,7 @@ export const likeCard = (req, res) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };
@@ -99,7 +99,7 @@ export const dislikeCard = (req, res) => {
     if (err.name === 'CastError' || err.name === 'ValidationError') {
       responseBadRequestError(res);
     } else {
-      responseServerError(res, err.message);
+      responseServerError(res);
     }
   });
 };
