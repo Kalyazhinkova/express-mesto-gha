@@ -24,12 +24,8 @@ export const read = (req, res) => {
     .then((cards) => {
       res.send(cards);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res);
-      } else {
-        responseServerError(res);
-      }
+    .catch(() => {
+      responseServerError(res);
     });
 };
 
