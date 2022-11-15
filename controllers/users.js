@@ -1,16 +1,16 @@
 import { constants } from 'http2';
 import { User } from '../models/user.js';
 
-const responseBadRequestError = (res, message) => res
+const responseBadRequestError = (res) => res
   .status(constants.HTTP_STATUS_BAD_REQUEST)
   .send({
-    message: `Некорректные данные для пользователя. ${message}`,
+    message: 'Некорректные данные для пользователя.',
   });
 
-const responseServerError = (res, message) => res
+const responseServerError = (res) => res
   .status(constants.HTTP_STATUS_SERVICE_UNAVAILABLE)
   .send({
-    message: `На сервере произошла ошибка. ${message}`,
+    message: 'На сервере произошла ошибка.',
   });
 
 const responseNotFound = (res, message) => res
@@ -24,12 +24,8 @@ export const readAll = (req, res) => {
     .then((users) => {
       res.send(users);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        responseBadRequestError(res, err.message);
-      } else {
-        responseServerError(res, err.message);
-      }
+    .catch(() => {
+      responseServerError(res);
     });
 };
 
@@ -44,9 +40,9 @@ export const readById = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };
@@ -60,9 +56,9 @@ export const create = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };
@@ -75,14 +71,14 @@ export const update = (req, res) => {
       if (updateUser) {
         res.send(updateUser);
       } else {
-        throw responseBadRequestError(res, 'Не удалось обновить пользователя');
+        throw responseNotFound(res, 'Не удалось обновить пользователя');
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };
@@ -95,14 +91,14 @@ export const updateAvatar = (req, res) => {
       if (updateUser) {
         res.send(updateUser);
       } else {
-        throw responseBadRequestError(res, 'Не удалось обновить пользователя');
+        throw responseNotFound(res, 'Не удалось обновить пользователя');
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
-        responseServerError(res, err.message);
+        responseServerError(res);
       }
     });
 };

@@ -10,7 +10,7 @@
     "mongoose": "^6.7.2"
   },
   "scripts": {
-    "start": "NODE_ENV=production node ./index.js",
+    "start": "node ./index.js",
     "lint": "eslint .",
     "dev": "nodemon ./index.js"
   },
