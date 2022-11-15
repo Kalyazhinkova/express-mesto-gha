@@ -1,10 +1,10 @@
 import { constants } from 'http2';
 import { Card } from '../models/card.js';
 
-const responseBadRequestError = (res, message) => res
+const responseBadRequestError = (res) => res
   .status(constants.HTTP_STATUS_BAD_REQUEST)
   .send({
-    message: `Некорректные данные карточки. ${message}`,
+    message: 'Некорректные данные карточки.',
   });
 
 const responseServerError = (res, message) => res
@@ -26,7 +26,7 @@ export const read = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
         responseServerError(res, err.message);
       }
@@ -42,7 +42,7 @@ export const create = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
         responseServerError(res, err.message);
       }
@@ -60,7 +60,7 @@ export const remove = (req, res) => {
     }).then((card) => { res.send(card); })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
         responseServerError(res, err.message);
       }
@@ -79,7 +79,7 @@ export const likeCard = (req, res) => {
       } else { res.send({ data: result }); }
     }).catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        responseBadRequestError(res, err.message);
+        responseBadRequestError(res);
       } else {
         responseServerError(res, err.message);
       }
@@ -97,7 +97,7 @@ export const dislikeCard = (req, res) => {
     } else { res.send(result); }
   }).catch((err) => {
     if (err.name === 'CastError' || err.name === 'ValidationError') {
-      responseBadRequestError(res, err.message);
+      responseBadRequestError(res);
     } else {
       responseServerError(res, err.message);
     }
