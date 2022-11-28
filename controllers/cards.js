@@ -1,17 +1,30 @@
 import { Card } from '../models/card.js';
-import { responseBadRequestError, responseServerError, responseNotFound } from '../errors/errors.js';
+import { HTTPError } from '../errors/HTTPError.js';
+import { BadRequestError } from '../errors/BadRequestError.js';
+import { ForbiddenError } from '../errors/ForbiddenError.js';
+import { NotFoundError } from '../errors/NotFoundError.js';
+import { ServerError } from '../errors/ServerError.js';
 
-export const read = (req, res) => {
+const notFoundError = (message) => new NotFoundError(message);
+const serverError = (message) => new ServerError(message);
+const badRequestError = (message) => new BadRequestError(`Некорректные данные для карточки. ${message}`);
+const forbiddenError = new ForbiddenError('Можно удалять только свои карточки!');
+
+export const read = (req, res, next) => {
   Card.find({})
     .then((cards) => {
       res.send(cards);
     })
-    .catch(() => {
-      responseServerError(res);
+    .catch((err) => {
+      if (err instanceof HTTPError) {
+        next(err);
+      } else {
+        next(serverError(err.message));
+      }
     });
 };
 
-export const create = (req, res) => {
+export const create = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
@@ -19,33 +32,39 @@ export const create = (req, res) => {
       res.send({ data: newCard });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        responseBadRequestError(res);
+      if (err instanceof HTTPError) {
+        next(err);
+      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(badRequestError(err.message));
       } else {
-        responseServerError(res);
+        next(serverError(err.message));
       }
     });
 };
 
-export const remove = (req, res) => {
-  Card.findOneAndRemove({ _id: req.params.id, owner: req.user._id })
+export const remove = (req, res, next) => {
+  Card.findOneAndRemove(req.params.id)
     .then((card) => {
       if (!card) {
-        throw responseNotFound(res, 'Запрашиваемая карточка не найдена');
+        throw notFoundError('Запрашиваемая карточка не найдена!');
+      } else if (card.owner.toString() !== req.user._id) {
+        throw forbiddenError;
       } else {
         res.send(card);
       }
     }).then((card) => { res.send(card); })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        responseBadRequestError(res);
+      if (err instanceof HTTPError) {
+        next(err);
+      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(badRequestError(err.message));
       } else {
-        responseServerError(res);
+        next(serverError(err.message));
       }
     });
 };
 
-export const likeCard = (req, res) => {
+export const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -53,31 +72,37 @@ export const likeCard = (req, res) => {
   )
     .then((result) => {
       if (!result) {
-        responseNotFound(res, 'Карточки с таким id не существует');
+        notFoundError('Карточки с таким id не существует');
       } else { res.send({ data: result }); }
-    }).catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        responseBadRequestError(res);
+    })
+    .catch((err) => {
+      if (err instanceof HTTPError) {
+        next(err);
+      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(badRequestError(err.message));
       } else {
-        responseServerError(res);
+        next(serverError(err.message));
       }
     });
 };
 
-export const dislikeCard = (req, res) => {
+export const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
     { new: true },
   ).then((result) => {
     if (!result) {
-      responseNotFound(res, 'Карточки с таким id не существует');
+      notFoundError('Карточки с таким id не существует');
     } else { res.send(result); }
-  }).catch((err) => {
-    if (err.name === 'CastError' || err.name === 'ValidationError') {
-      responseBadRequestError(res);
-    } else {
-      responseServerError(res);
-    }
-  });
+  })
+    .catch((err) => {
+      if (err instanceof HTTPError) {
+        next(err);
+      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(badRequestError(err.message));
+      } else {
+        next(serverError(err.message));
+      }
+    });
 };
