@@ -28,7 +28,7 @@ export const run = async (envName) => {
   app.set('config', config);
   app.use(bodyParser.json());
 
-  app.use('/', userRouter);
+  // app.use('/', userRouter);
   app.use('/users', auth, userRouter);
   app.use('/cards', auth, cardRouter);
   app.use(errors());
