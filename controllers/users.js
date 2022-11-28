@@ -111,8 +111,8 @@ export const update = (req, res, next) => {
 
 export const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  const userId = req.user._id;
-  User.findByIdAndUpdate(userId, { avatar }, { new: true })
+  const { _id } = req.user;
+  User.findByIdAndUpdate(_id, { avatar }, { new: true })
     .then((updateUser) => {
       if (updateUser) {
         res.send(updateUser);
