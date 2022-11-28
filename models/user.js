@@ -46,8 +46,9 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email }).select('+password')
+userSchema.statics.findOneAndValidatePassword = function ({ email, password }) {
+  return this.findOne({ email })
+    .select('+password')
     .then((user) => {
       if (!user) {
         throw new UnathorizedError('Пользователь с такими данными не найден');
@@ -58,9 +59,9 @@ userSchema.statics.findUserByCredentials = function (email, password) {
             throw new UnathorizedError('Неправильная почта или пароль');
           }
           // удаляем пароль из объекта пользователя и превращаем в объект
-          // const { password: removed, ...userWithoutPassword } = user.toObject();
-          const userWithoutPassword = user.toObject();
-          delete userWithoutPassword.password;
+          const { password: removed, ...userWithoutPassword } = user.toObject();
+          // const userWithoutPassword = user.toObject();
+          // delete userWithoutPassword.password;
           return userWithoutPassword;
         });
     });
