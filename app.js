@@ -8,6 +8,7 @@ import { errors } from 'celebrate';
 
 import { router as userRouter } from './routes/users.js';
 import { router as cardRouter } from './routes/cards.js';
+import { router as authRouter } from './routes/auth.js';
 import { auth } from './middlewares/auth.js';
 
 export const run = async (envName) => {
@@ -28,7 +29,7 @@ export const run = async (envName) => {
   app.set('config', config);
   app.use(bodyParser.json());
 
-  // app.use('/', userRouter);
+  app.use('/', authRouter);
   app.use('/users', auth, userRouter);
   app.use('/cards', auth, cardRouter);
   app.use(errors());

@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import {
-  readAll, readById, create, update, updateAvatar, login,
+  readAll, readById, update, updateAvatar,
 } from '../controllers/users.js';
 import {
-  celebrateBodyAuth,
-  celebrateBodyUser,
+  // celebrateBodyAuth,
+  // celebrateBodyUser,
   celebrateParamsRouteMe,
   celebrateBodyAvatar,
   celebrateBodyProfile,
@@ -16,5 +16,5 @@ router.get('/', readAll);
 router.get('/:id', celebrateParamsRouteMe, readById);
 router.patch('/me', celebrateBodyProfile, update);
 router.patch('/me/avatar', celebrateBodyAvatar, updateAvatar);
-router.post('/signin', celebrateBodyAuth, login);
-router.post('/signup', celebrateBodyUser, create);
+// router.post('/signin', celebrateBodyAuth, login);
+// router.post('/signup', celebrateBodyUser, create);
