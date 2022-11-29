@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { UnathorizedError } from '../errors/UnauthorizedError.js';
-import { schemaAvatar, schemaEmail } from '../validators/users.js';
+import { schemaEmail } from '../validators/users.js';
 
 const { Schema } = mongoose;
 
@@ -24,8 +24,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
     validate: {
-      validator: (value) => !schemaAvatar.validate(value).error,
-      message: () => 'Аватар задается в виде ссылки!',
+      validator(v) {
+        const urlCheck = /^http[s]*:\/\/.+$/;
+        return urlCheck.test(v);
+      },
+      message: 'Аватар задается в виде ссылки!',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },

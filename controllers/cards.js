@@ -72,7 +72,7 @@ export const likeCard = (req, res, next) => {
   )
     .then((result) => {
       if (!result) {
-        notFoundError('Карточки с таким id не существует');
+        throw notFoundError('Карточки с таким id не существует');
       } else { res.send({ data: result }); }
     })
     .catch((err) => {
