@@ -93,7 +93,7 @@ export const dislikeCard = (req, res, next) => {
     { new: true },
   ).then((result) => {
     if (!result) {
-      notFoundError('Карточки с таким id не существует');
+      throw notFoundError('Карточки с таким id не существует');
     } else { res.send(result); }
   })
     .catch((err) => {
