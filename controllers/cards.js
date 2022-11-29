@@ -8,7 +8,6 @@ import { ServerError } from '../errors/ServerError.js';
 const notFoundError = (message) => new NotFoundError(message);
 const serverError = (message) => new ServerError(message);
 const badRequestError = (message) => new BadRequestError(`Некорректные данные для карточки. ${message}`);
-const forbiddenError = new ForbiddenError('Можно удалять только свои карточки!');
 
 export const read = (req, res, next) => {
   Card.find({})
@@ -16,11 +15,12 @@ export const read = (req, res, next) => {
       res.send(cards);
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else {
-        next(serverError(err.message));
-      }
+      next(err);
+      // if (err instanceof HTTPError) {
+      //   next(err);
+      // } else {
+      //   next(serverError(err.message));
+      // }
     });
 };
 
@@ -48,7 +48,7 @@ export const remove = (req, res, next) => {
       if (!card) {
         throw notFoundError('Запрашиваемая карточка не найдена!');
       } else if (card.owner.toString() !== req.user._id) {
-        throw forbiddenError;
+        throw new ForbiddenError('Можно удалять только свои карточки!');
       } else {
         res.send(card);
       }

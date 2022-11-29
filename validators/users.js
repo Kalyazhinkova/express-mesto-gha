@@ -1,22 +1,21 @@
 import { Joi, Segments } from 'celebrate';
-import { celebrate, sсhemaObjectId } from './common.js';
+import { celebrate, sсhemaObjectId, sсhemaURL } from './common.js';
 
 const schemaRouterMe = Joi.alternatives().try(
   Joi.string().equal('me'),
   sсhemaObjectId,
 ).required();
 
-export const schemaAvatar = Joi.string().uri({ scheme: ['http', 'https'] });
+export const schemaAvatar = sсhemaURL;
 export const schemaEmail = Joi.string().email().required();
 const schemaPassword = Joi.string().required();
 const schemaName = Joi.string().min(2).max(30);
 const schemaAbout = Joi.string().min(2).max(30);
 
 const schemaObjectRouteMe = Joi.object({ id: schemaRouterMe }).required();
-const schemaObjectProfile = Joi.object({ name: schemaName, about: schemaAbout }).required();
+const schemaObjectProfile = Joi.object({ name: schemaName, about: schemaAbout });
 const schemaObjectAvatar = Joi.object({ avatar: schemaAvatar }).required();
-const schemaObjectUserAuth = Joi.object({ email: schemaEmail, password: schemaPassword })
-  .required();
+const schemaObjectUserAuth = Joi.object({ email: schemaEmail, password: schemaPassword });
 const schemaObjectUser = schemaObjectUserAuth
   .concat(schemaObjectProfile).concat(schemaObjectAvatar);
 

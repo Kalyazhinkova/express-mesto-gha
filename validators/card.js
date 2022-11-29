@@ -5,7 +5,7 @@ export const schemaLink = sсhemaURL.required();
 export const schemaName = Joi.string().min(2).max(30).required();
 export const schemaRouterId = sсhemaObjectId;
 
-export const schemaObjectCard = Joi.object({ name: schemaName, link: schemaLink }).required();
+export const schemaObjectCard = Joi.object({ name: schemaName, link: schemaLink });
 export const schemaObjectRouterId = Joi.object({ id: schemaRouterId }).required();
 
 export const segmentBodyCard = { [Segments.BODY]: schemaObjectCard };
