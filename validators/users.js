@@ -1,12 +1,12 @@
 import { Joi, Segments } from 'celebrate';
-import { celebrate, sсhemaObjectId, sсhemaURL } from './common.js';
+import { celebrate, sсhemaObjectId } from './common.js';
 
 const schemaRouterMe = Joi.alternatives().try(
   Joi.string().equal('me'),
   sсhemaObjectId,
 ).required();
 
-export const schemaAvatar = sсhemaURL;
+export const schemaAvatar = Joi.string().uri({ scheme: ['http', 'https'] });
 export const schemaEmail = Joi.string().email().required();
 const schemaPassword = Joi.string().required();
 const schemaName = Joi.string().min(2).max(30);
@@ -21,7 +21,7 @@ const schemaObjectUser = schemaObjectUserAuth
   .concat(schemaObjectProfile).concat(schemaObjectAvatar);
 
 const segmentBodyProfile = { [Segments.BODY]: schemaObjectProfile };
-const segmentBodyAvatar = { [Segments.BODY]: schemaAvatar };
+const segmentBodyAvatar = { [Segments.BODY]: schemaObjectAvatar };
 const segmentBodyUserAuth = { [Segments.BODY]: schemaObjectUserAuth };
 const segmentBodyUser = { [Segments.BODY]: schemaObjectUser };
 const segmentParamsRouteMe = { [Segments.PARAMS]: schemaObjectRouteMe };
