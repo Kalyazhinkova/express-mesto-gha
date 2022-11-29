@@ -7,4 +7,5 @@ export const celebrate = celebrator(
 );
 
 export const sсhemaObjectId = Joi.string().hex().length(24); // как валидировать ObjectID
-export const sсhemaURL = Joi.string().uri({ scheme: ['http', 'https'] }); // проверка на url
+// eslint-disable-next-line no-useless-escape
+export const sсhemaURL = Joi.string().pattern(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/); // проверка на url

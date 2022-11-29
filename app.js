@@ -10,6 +10,7 @@ import { router as userRouter } from './routes/users.js';
 import { router as cardRouter } from './routes/cards.js';
 import { router as authRouter } from './routes/auth.js';
 import { auth } from './middlewares/auth.js';
+import { NotFoundError } from './errors/NotFoundError.js';
 
 export const run = async (envName) => {
   process.on('unhandleRejection', (err) => {
@@ -18,8 +19,12 @@ export const run = async (envName) => {
   });
 
   const config = dotenv.config({ path: path.resolve('.env.common') }).parsed;
-  if (!config) {
-    throw new Error('Config not found');
+  try {
+    if (!config) {
+      throw new Error('Config not found');
+    }
+  } catch (err) {
+    throw new NotFoundError('Config не найден');
   }
 
   config.NODE_ENV = envName;
@@ -32,10 +37,8 @@ export const run = async (envName) => {
   app.use('/', authRouter);
   app.use('/users', auth, userRouter);
   app.use('/cards', auth, cardRouter);
+  app.all('/*', () => { throw new NotFoundError('Запрашиваемая страница не найдена'); });
   app.use(errors());
-  app.all('/*', (req, res) => {
-    res.status(constants.HTTP_STATUS_NOT_FOUND).send({ message: 'Запрашиваемая страница не найдена' });
-  });
 
   app.use((err, req, res, next) => {
     const status = err.statusCode || constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;

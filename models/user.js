@@ -25,7 +25,8 @@ const userSchema = new Schema({
     required: true,
     validate: {
       validator(v) {
-        const urlCheck = /^http[s]*:\/\/.+$/;
+        // eslint-disable-next-line no-useless-escape
+        const urlCheck = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
         return urlCheck.test(v);
       },
       message: 'Аватар задается в виде ссылки!',
