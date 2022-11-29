@@ -1,16 +1,11 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.js';
-import { HTTPError } from '../errors/HTTPError.js';
 import { BadRequestError } from '../errors/BadRequestError.js';
 import { ConflictError } from '../errors/ConflictError.js';
 import { NotFoundError } from '../errors/NotFoundError.js';
-import { ServerError } from '../errors/ServerError.js';
 
-const notFoundError = new NotFoundError('Пользователь не найден!');
-const serverError = (message) => new ServerError(message);
 const badRequestError = (message) => new BadRequestError(message);
-const notUniqueError = new ConflictError('Пользователь с такой почтой уже существует!');
 const notUniqueErrorCode = 11000;
 
 export const login = (req, res, next) => {
@@ -36,14 +31,12 @@ export const create = (req, res, next) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.code === notUniqueErrorCode) {
-        next(notUniqueError);
+      if (err.code === notUniqueErrorCode) {
+        next(new ConflictError('Пользователь с такой почтой уже существует!'));
       } else if (err.name === 'ValidationError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
@@ -53,18 +46,16 @@ export const readById = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        throw notFoundError;
+        throw new NotFoundError('Пользователь не найден!');
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.name === 'CastError') {
+      if (err.name === 'CastError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
@@ -75,11 +66,7 @@ export const readAll = (req, res, next) => {
       res.send(users);
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else {
-        next(serverError(err.message));
-      }
+      next(err);
     });
 };
 
@@ -91,16 +78,14 @@ export const update = (req, res, next) => {
       if (updateUser) {
         res.send(updateUser);
       } else {
-        throw notFoundError('Не удалось обновить пользователя');
+        throw new NotFoundError('Не удалось обновить пользователя');
       }
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
@@ -113,16 +98,14 @@ export const updateAvatar = (req, res, next) => {
       if (updateUser) {
         res.send(updateUser);
       } else {
-        throw notFoundError('Не удалось обновить аватар пользователя');
+        throw new NotFoundError('Не удалось обновить аватар пользователя');
       }
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
