@@ -21,11 +21,7 @@ export const login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else {
-        next(serverError(err.message));
-      }
+      next(err);
     });
 };
 

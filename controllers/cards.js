@@ -1,12 +1,9 @@
 import { Card } from '../models/card.js';
-import { HTTPError } from '../errors/HTTPError.js';
 import { BadRequestError } from '../errors/BadRequestError.js';
 import { ForbiddenError } from '../errors/ForbiddenError.js';
 import { NotFoundError } from '../errors/NotFoundError.js';
-import { ServerError } from '../errors/ServerError.js';
 
 const notFoundError = (message) => new NotFoundError(message);
-const serverError = (message) => new ServerError(message);
 const badRequestError = (message) => new BadRequestError(`Некорректные данные для карточки. ${message}`);
 
 export const read = (req, res, next) => {
@@ -16,11 +13,6 @@ export const read = (req, res, next) => {
     })
     .catch((err) => {
       next(err);
-      // if (err instanceof HTTPError) {
-      //   next(err);
-      // } else {
-      //   next(serverError(err.message));
-      // }
     });
 };
 
@@ -32,12 +24,10 @@ export const create = (req, res, next) => {
       res.send({ data: newCard });
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
@@ -54,12 +44,10 @@ export const remove = (req, res, next) => {
       }
     }).then((card) => { res.send(card); })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'CastError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
@@ -76,12 +64,10 @@ export const likeCard = (req, res, next) => {
       } else { res.send({ data: result }); }
     })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'CastError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
@@ -97,12 +83,10 @@ export const dislikeCard = (req, res, next) => {
     } else { res.send(result); }
   })
     .catch((err) => {
-      if (err instanceof HTTPError) {
-        next(err);
-      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(badRequestError(err.message));
       } else {
-        next(serverError(err.message));
+        next(err);
       }
     });
 };
