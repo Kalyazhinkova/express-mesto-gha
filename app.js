@@ -19,12 +19,8 @@ export const run = async (envName) => {
   });
 
   const config = dotenv.config({ path: path.resolve('.env.common') }).parsed;
-  try {
-    if (!config) {
-      throw new Error('Config not found');
-    }
-  } catch (err) {
-    throw new NotFoundError('Config не найден');
+  if (!config) {
+    throw new Error('Config not found');
   }
 
   config.NODE_ENV = envName;
