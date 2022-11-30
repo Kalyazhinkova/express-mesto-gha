@@ -36,11 +36,11 @@ export const remove = (req, res, next) => {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Запрашиваемая карточка не найдена!');
-      } else if (card.owner.toString() !== req.user._id) {
-        throw new ForbiddenError('Можно удалять только свои карточки!');
-      } else {
-        return Card.findByIdAndRemove(req.params.id);
       }
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Можно удалять только свои карточки!');
+      }
+      return Card.findByIdAndRemove(req.params.id);
     }).then((card) => { res.send(card); })
     .catch((err) => {
       if (err.name === 'CastError') {
